@@ -281,28 +281,29 @@
     }
 
     .zoomable {
-      transition: transform 0.3s ease;
-      cursor: zoom-in;
-    }
+  transition: transform 0.3s ease;
+  cursor: zoom-in;
+}
 
-    .zoomed {
-      cursor: grab;
-      position: relative;
-    }
+.zoomed {
+  cursor: grab;
+  position: relative;
+  transition: none;
+}
 
-    .slider-container {
-      overflow: hidden;
-    }
+.slider-container {
+  overflow: hidden;
+}
 
-    .slider {
-      display: flex;
-      transition: transform 0.3s ease;
-    }
+.slider {
+  display: flex;
+  transition: transform 0.3s ease;
+}
 
-    .slider img {
-      width: 100%;
-      flex-shrink: 0;
-    }
+.slider img {
+  width: 100%;
+  flex-shrink: 0;
+}
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -396,12 +397,14 @@
       const slider = modal.querySelector('.slider');
 
       slider.addEventListener('touchstart', (e) => {
+        if (isZoomed) return; // Если изображение увеличено, не начинаем свайп слайдера
         startX = e.touches[0].clientX;
         currentX = startX;
         slider.style.transition = 'none';
       }, { passive: true });
 
       slider.addEventListener('touchmove', (e) => {
+        if (isZoomed) return; // Если изображение увеличено, не двигаем слайдер
         currentX = e.touches[0].clientX;
         const diff = currentX - startX;
         const shift = -(currentImageIndex * 100) + (diff / slider.offsetWidth * 100);
@@ -474,18 +477,30 @@
       function startDrag(e) {
         if (!e.target.classList.contains('zoomed')) return;
         isDragging = true;
-        startPos = { x: e.clientX, y: e.clientY };
+        startPos = { 
+          x: e.clientX || e.touches[0].clientX, 
+          y: e.clientY || e.touches[0].clientY 
+        };
         currentPos = { ...startPos };
         e.target.style.cursor = 'grabbing';
+        
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchmove', drag, { passive: false });
+        document.addEventListener('touchend', endDrag);
+        
+        e.preventDefault(); // Предотвращаем срабатывание других обработчиков
       }
 
       function drag(e) {
         if (!isDragging) return;
         e.preventDefault();
-        const dx = e.clientX - currentPos.x;
-        const dy = e.clientY - currentPos.y;
-        currentPos = { x: e.clientX, y: e.clientY };
-        const img = e.target;
+        const clientX = e.clientX || e.touches[0].clientX;
+        const clientY = e.clientY || e.touches[0].clientY;
+        const dx = clientX - currentPos.x;
+        const dy = clientY - currentPos.y;
+        currentPos = { x: clientX, y: clientY };
+        const img = modal.querySelector('.zoomed');
         const rect = img.getBoundingClientRect();
         const scale = 2;
         const maxX = (rect.width * scale - rect.width) / 2;
@@ -499,7 +514,13 @@
       function endDrag(e) {
         if (!isDragging) return;
         isDragging = false;
-        e.target.style.cursor = 'grab';
+        const img = modal.querySelector('.zoomed');
+        if (img) img.style.cursor = 'grab';
+        
+        document.removeEventListener('mousemove', drag);
+        document.removeEventListener('mouseup', endDrag);
+        document.removeEventListener('touchmove', drag);
+        document.removeEventListener('touchend', endDrag);
       }
     });
   </script>
