@@ -98,26 +98,41 @@
       }
     }
   </style>
+  <script>
+    function loadImage(imgElement, highResSrc) {
+      const tempImg = new Image();
+      tempImg.src = highResSrc;
+      tempImg.onload = () => {
+        imgElement.src = highResSrc;
+      };
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const images = document.querySelectorAll('img[data-highres]');
+      images.forEach(img => {
+        loadImage(img, img.dataset.highres);
+      });
+    });
+  </script>
 </head>
 <body>
   <div class="container">
     <h1>Добро пожаловать!</h1>
-    <img src="logo.png" alt="Логотип заведения" class="logo">
+    <img src="logo_low.png" data-highres="logo.png" alt="Логотип заведения" class="logo">
     <p>Следите за новостями здесь</p>
     <div class="social-icons">
-      <a href="https://vk.com/vinegret_donetsk"><img src="vk_logo.png" alt="ВКонтакте"></a>
-      <a href="https://t.me/vinegret_dn"><img src="tg_logo.svg" alt="Телеграм"></a>
-      <a href="https://www.instagram.com/vinegret_don?igsh=N3ptemlsZzhwemVs"><img src="ig_logo.webp" alt="Инстаграм"></a>
+      <a href="https://vk.com/vinegret_donetsk"><img src="vk_logo_low.png" data-highres="vk_logo.png" alt="ВКонтакте"></a>
+      <a href="https://t.me/vinegret_dn"><img src="tg_logo_low.svg" data-highres="tg_logo.svg" alt="Телеграм"></a>
+      <a href="https://www.instagram.com/vinegret_don?igsh=N3ptemlsZzhwemVs"><img src="ig_logo_low.webp" data-highres="ig_logo.webp" alt="Инстаграм"></a>
     </div>
     <p class="phone"><a href="tel:+79495061116">Телефон: +7 949 506 11 16</a></p>
     <div>
-      <img src="menu1.jpg" alt="Меню 1">
-      <img src="menu3.jpg" alt="Меню 2">
-      <img src="menu2.jpg" alt="Меню 3">
-      <img src="menu4.jpg" alt="Меню 4">
-      <img src="menu5.jpg" alt="Меню 5">
+      <img src="menu1_low.jpg" data-highres="menu1.jpg" alt="Меню 1">
+      <img src="menu3_low.jpg" data-highres="menu3.jpg" alt="Меню 2">
+      <img src="menu2_low.jpg" data-highres="menu2.jpg" alt="Меню 3">
+      <img src="menu4_low.jpg" data-highres="menu4.jpg" alt="Меню 4">
+      <img src="menu5_low.jpg" data-highres="menu5.jpg" alt="Меню 5">
     </div>
-    
   </div>
   <footer class="bg-light text-center p-3">
     <p>ООО "ТАМЕЛЬ"</p>
