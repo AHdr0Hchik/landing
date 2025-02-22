@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Меню Кафе</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #333;
+    }
+
+    .container {
+      max-width: 800px;
+      padding: 20px;
+      margin: 20px auto;
+      background: #fff;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      color: #e74c3c;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      margin: 15px 0;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .social-icons {
+      margin: 20px 0;
+    }
+
+    .social-icons img {
+      width: 40px;
+      height: 40px;
+      margin: 0 15px;
+      transition: transform 0.2s ease;
+    }
+
+    .social-icons img:hover {
+      transform: scale(1.1);
+    }
+
+    .phone {
+      font-size: 1.2em;
+      margin-top: 20px;
+      color: #27ae60;
+    }
+    
+    .logo {
+      max-width: 50% !important;
+      height: auto;
+      box-shadow: none !important;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      img {
+        margin: 10px 0;
+      }
+
+      .social-icons img {
+        width: 30px;
+        height: 30px;
+      }
+
+      .phone {
+        font-size: 1em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Добро пожаловать!</h1>
+    <img src="logo.png" alt="Логотип заведения" class="logo">
+    <p>Следите за новостями здесь</p>
+    <div class="social-icons">
+      <a href="https://vk.com/ваша_страница"><img src="vk_logo.png" alt="ВКонтакте"></a>
+      <a href="https://t.me/ваша_страница"><img src="tg_logo.svg" alt="Телеграм"></a>
+      <a href="https://instagram.com/ваша_страница"><img src="ig_logo.webp" alt="Инстаграм"></a>
+    </div>
+    <p class="phone">Телефон: +7 000 000 00 00</p>
+    <div>
+      <img src="menu1.jpg" alt="Меню 1">
+      <img src="menu2.jpg" alt="Меню 2">
+      <img src="menu3.jpg" alt="Меню 3">
+      <img src="menu4.jpg" alt="Меню 4">
+      <img src="menu5.jpg" alt="Меню 5">
+    </div>
+    
+  </div>
+  <footer class="bg-light text-center p-3">
+    <p>ООО "ТАМЕЛЬ"</p>
+    <p>ИНН: 9307005340</p>
+    <p>ОГРН: 1229300088599</p>
+    <p>Юридический и фактический адрес: Донецкая Народная респ., Шахтерский м.о., г. Кировское, ул. Панфиловцев, д. 34Б</p>
+    <p>© 2025 Винегрет. Все права защищены.</p>
+</footer>
+</body>
+</html>
