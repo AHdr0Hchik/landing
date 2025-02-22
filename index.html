@@ -280,40 +280,16 @@
       }
     }
 
-    .slide {
-      position: relative;
-      overflow: hidden;
-      width: 100%;
-      height: 100%;
-      touch-action: none; /* Отключает стандартные жесты браузера */
+    .zoomable {
+      transition: transform 0.3s ease;
+      cursor: zoom-in;
     }
 
-    .slide img {
-      width: 100%;
-      height: auto;
-      transform-origin: center center;
-      will-change: transform;
-      cursor: grab;
+    .zoomed {
+      cursor: zoom-out;
     }
-
-    .slide img:active {
-      cursor: grabbing;
-    }
-
   </style>
   <script>
-    let isScaling = false;
-    let startDistance = 0;
-    let currentScale = 1;
-    let initialScale = 1;
-    let panX = 0;
-    let panY = 0;
-    let initialPanX = 0;
-    let initialPanY = 0;
-
-
-
-
     document.addEventListener('DOMContentLoaded', () => {
       const sections = [
         {
@@ -331,25 +307,13 @@
           background: 'bg.jpg',
           images: ['menu4.jpg', 'menu5.jpg']
         }
-        
       ];
-
-      let requestId = null;
-
-      function applyTransform() {
-        if (!requestId) {
-          requestId = requestAnimationFrame(() => {
-            img.style.transform = `scale(${currentScale}) translate(${initialPanX / currentScale}px, ${initialPanY / currentScale}px)`;
-            requestId = null;
-          });
-        }
-      }
-
 
       let currentSection = null;
       let currentImageIndex = 0;
       let startX = 0;
       let currentX = 0;
+
       const container = document.createElement('div');
       container.className = 'preview-container';
 
@@ -395,116 +359,24 @@
         const slider = modal.querySelector('.slider');
         slider.style.transform = `translateX(-${currentImageIndex * 100}%)`;
         slider.innerHTML = currentSection.images
-          .map(img => `
-            <div class="slide">
-              <img src="${img}" alt="Slide">
-            </div>
-          `)
+          .map(img => `<img src="${img}" alt="Slide" class="zoomable">`)
           .join('');
-
-        const slides = modal.querySelectorAll('.slide img');
-        slides.forEach(img => {
-          addGestureHandlers(img);
+        
+        // Добавляем обработчики для увеличения изображений
+        slider.querySelectorAll('.zoomable').forEach(img => {
+          img.addEventListener('click', () => toggleZoom(img));
         });
       }
 
-      function applyTransform() {
-        const rect = img.getBoundingClientRect();
-        const containerRect = slide.getBoundingClientRect();
-
-        // Вычисляем максимальные смещения
-        const maxPanX = (rect.width - containerRect.width) / 2;
-        const maxPanY = (rect.height - containerRect.height) / 2;
-
-        // Ограничиваем панорамирование
-        const panX = Math.min(Math.max(initialPanX, -maxPanX), maxPanX);
-        const panY = Math.min(Math.max(initialPanY, -maxPanY), maxPanY);
-
-        img.style.transform = `scale(${currentScale}) translate(${panX / currentScale}px, ${panY / currentScale}px)`;
-      }     
-
-      function addGestureHandlers(img) {
-        let startX = 0;
-        let startY = 0;
-        let initialX = 0;
-        let initialY = 0;
-        let lastTouchEnd = 0;
-
-        img.addEventListener('touchstart', onTouchStart, { passive: false });
-        img.addEventListener('touchmove', onTouchMove, { passive: false });
-        img.addEventListener('touchend', onTouchEnd, { passive: false });
-
-        function onTouchStart(e) {
-          if (e.touches.length === 1 && currentScale > 1) {
-            // Панорамирование
-            startX = e.touches[0].clientX - initialPanX;
-            startY = e.touches[0].clientY - initialPanY;
-          } else if (e.touches.length === 2) {
-            // Масштабирование
-            isScaling = true;
-            startDistance = getDistance(e.touches[0], e.touches[1]);
-            initialScale = currentScale;
-          }
-
-          // Для обработки двойного тапа
-          const now = new Date().getTime();
-          if (now - lastTouchEnd <= 300) {
-            e.preventDefault();
-            if (currentScale > 1) {
-              resetTransform();
-            } else {
-              currentScale = 2; // Задай желаемый масштаб при двойном тапе
-              applyTransform();
-            }
-          }
-          lastTouchEnd = now;
-        }
-
-        function onTouchMove(e) {
-          e.preventDefault();
-          if (e.touches.length === 1 && currentScale > 1 && !isScaling) {
-            // Панорамирование
-            initialPanX = e.touches[0].clientX - startX;
-            initialPanY = e.touches[0].clientY - startY;
-            applyTransform();
-          } else if (e.touches.length === 2) {
-            // Масштабирование
-            const newDistance = getDistance(e.touches[0], e.touches[1]);
-            currentScale = initialScale * (newDistance / startDistance);
-            currentScale = Math.max(1, Math.min(currentScale, 4)); // Ограничиваем масштаб
-            applyTransform();
-          }
-        }
-
-        function onTouchEnd(e) {
-          if (e.touches.length < 2) {
-            isScaling = false;
-          }
-          if (e.touches.length === 0 && currentScale === 1) {
-            resetTransform();
-          }
-        }
-
-        function applyTransform() {
-          img.style.transform = `scale(${currentScale}) translate(${initialPanX / currentScale}px, ${initialPanY / currentScale}px)`;
-        }
-
-        function resetTransform() {
-          currentScale = 1;
-          initialPanX = 0;
-          initialPanY = 0;
-          img.style.transform = 'none';
+      function toggleZoom(img) {
+        if (img.classList.contains('zoomed')) {
+          img.classList.remove('zoomed');
+          img.style.transform = '';
+        } else {
+          img.classList.add('zoomed');
+          img.style.transform = 'scale(2)';
         }
       }
-
-
-      function getDistance(touch1, touch2) {
-        const dx = touch1.clientX - touch2.clientX;
-        const dy = touch1.clientY - touch2.clientY;
-        return Math.hypot(dx, dy);
-      }
-
-
 
       function updatePagination() {
         const pagination = modal.querySelector('.pagination');
@@ -524,39 +396,33 @@
       const slider = modal.querySelector('.slider');
 
       slider.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1 && currentScale === 1) {
-          startX = e.touches[0].clientX;
-          currentX = startX;
-          slider.style.transition = 'none';
-        }
+        startX = e.touches[0].clientX;
+        currentX = startX;
+        slider.style.transition = 'none';
       }, { passive: true });
 
       slider.addEventListener('touchmove', (e) => {
-        if (e.touches.length === 1 && currentScale === 1) {
-          currentX = e.touches[0].clientX;
-          const diff = currentX - startX;
-          const shift = -(currentImageIndex * 100) + (diff / slider.offsetWidth * 100);
-          slider.style.transform = `translateX(${shift}%)`;
-        }
+        currentX = e.touches[0].clientX;
+        const diff = currentX - startX;
+        const shift = -(currentImageIndex * 100) + (diff / slider.offsetWidth * 100);
+        slider.style.transform = `translateX(${shift}%)`;
       }, { passive: true });
 
       slider.addEventListener('touchend', () => {
-        if (currentScale === 1) {
-          slider.style.transition = 'transform 0.3s ease';
-          const diff = currentX - startX;
-          const threshold = slider.offsetWidth * 0.2;
+        slider.style.transition = 'transform 0.3s ease';
+        const diff = currentX - startX;
+        const threshold = slider.offsetWidth * 0.2;
 
-          if (Math.abs(diff) > threshold) {
-            if (diff > 0 && currentImageIndex > 0) {
-              currentImageIndex--;
-            } else if (diff < 0 && currentImageIndex < currentSection.images.length - 1) {
-              currentImageIndex++;
-            }
+        if (Math.abs(diff) > threshold) {
+          if (diff > 0 && currentImageIndex > 0) {
+            currentImageIndex--;
+          } else if (diff < 0 && currentImageIndex < currentSection.images.length - 1) {
+            currentImageIndex++;
           }
-
-          updateSlider();
-          updatePagination();
         }
+
+        updateSlider();
+        updatePagination();
       });
 
       modal.addEventListener('click', (e) => {
