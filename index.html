@@ -279,15 +279,6 @@
         bottom: 10px;
       }
     }
-
-    .zoomable {
-      transition: transform 0.3s ease;
-      cursor: zoom-in;
-    }
-
-    .zoomed {
-      cursor: zoom-out;
-    }
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -359,23 +350,8 @@
         const slider = modal.querySelector('.slider');
         slider.style.transform = `translateX(-${currentImageIndex * 100}%)`;
         slider.innerHTML = currentSection.images
-          .map(img => `<img src="${img}" alt="Slide" class="zoomable">`)
+          .map(img => `<img src="${img}" alt="Slide">`)
           .join('');
-        
-        // Добавляем обработчики для увеличения изображений
-        slider.querySelectorAll('.zoomable').forEach(img => {
-          img.addEventListener('click', () => toggleZoom(img));
-        });
-      }
-
-      function toggleZoom(img) {
-        if (img.classList.contains('zoomed')) {
-          img.classList.remove('zoomed');
-          img.style.transform = '';
-        } else {
-          img.classList.add('zoomed');
-          img.style.transform = 'scale(2)';
-        }
       }
 
       function updatePagination() {
@@ -436,6 +412,71 @@
           modal.style.display = 'none';
         }
       });
+
+      let isDragging = false;
+      let startPos = { x: 0, y: 0 };
+      let currentPos = { x: 0, y: 0 };
+
+      function updateSlider() {
+        const slider = modal.querySelector('.slider');
+        slider.style.transform = `translateX(-${currentImageIndex * 100}%)`;
+        slider.innerHTML = currentSection.images
+          .map(img => `<img src="${img}" alt="Slide" class="zoomable">`)
+          .join('');
+        
+        slider.querySelectorAll('.zoomable').forEach(img => {
+          img.addEventListener('click', (e) => toggleZoom(img, e));
+          img.addEventListener('mousedown', startDrag);
+          img.addEventListener('mousemove', drag);
+          img.addEventListener('mouseup', endDrag);
+          img.addEventListener('mouseleave', endDrag);
+        });
+      }
+
+      function toggleZoom(img, e) {
+        if (img.classList.contains('zoomed')) {
+          img.classList.remove('zoomed');
+          img.style.transform = '';
+        } else {
+          img.classList.add('zoomed');
+          const rect = img.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          img.style.transformOrigin = `${x}px ${y}px`;
+          img.style.transform = 'scale(2)';
+        }
+      }
+
+      function startDrag(e) {
+        if (!e.target.classList.contains('zoomed')) return;
+        isDragging = true;
+        startPos = { x: e.clientX, y: e.clientY };
+        currentPos = { ...startPos };
+        e.target.style.cursor = 'grabbing';
+      }
+
+      function drag(e) {
+        if (!isDragging) return;
+        e.preventDefault();
+        const dx = e.clientX - currentPos.x;
+        const dy = e.clientY - currentPos.y;
+        currentPos = { x: e.clientX, y: e.clientY };
+        const img = e.target;
+        const rect = img.getBoundingClientRect();
+        const scale = 2;
+        const maxX = (rect.width * scale - rect.width) / 2;
+        const maxY = (rect.height * scale - rect.height) / 2;
+        const currentX = parseFloat(img.style.left || '0');
+        const currentY = parseFloat(img.style.top || '0');
+        img.style.left = `${Math.max(-maxX, Math.min(maxX, currentX + dx))}px`;
+        img.style.top = `${Math.max(-maxY, Math.min(maxY, currentY + dy))}px`;
+      }
+
+      function endDrag(e) {
+        if (!isDragging) return;
+        isDragging = false;
+        e.target.style.cursor = 'grab';
+      }
     });
   </script>
 </head>
