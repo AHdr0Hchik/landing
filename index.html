@@ -68,6 +68,43 @@
       box-shadow: none !important;
     }
 
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .section h2 {
+      font-size: 2em;
+      margin-bottom: 10px;
+      cursor: pointer;
+      color: #27ae60;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid #27ae60;
+      border-radius: 5px;
+      transition: background-color 0.2s ease;
+    }
+
+    .section h2::after {
+      content: '▼';
+      font-size: 0.5em;
+      transition: transform 0.2s ease;
+    }
+
+    .section.active h2::after {
+      transform: rotate(180deg);
+    }
+
+    .section img {
+      display: none;
+      transition: display 0.2s ease;
+    }
+
+    .section.active img {
+      display: block;
+    }
+
     @media (max-width: 768px) {
       .container {
         padding: 10px;
@@ -92,13 +129,21 @@
         font-size: 1.2rem;
       }
 
-      .phone a{
-        color:#27ae60;
+      .phone a {
+        color: #27ae60;
         text-decoration: none;
+      }
+
+      .section h2 {
+        font-size: 1.5em;
       }
     }
   </style>
   <script>
+    function toggleSection(section) {
+      section.classList.toggle('active');
+    }
+
     function loadImage(imgElement, highResSrc) {
       const tempImg = new Image();
       tempImg.src = highResSrc;
@@ -112,6 +157,11 @@
       images.forEach(img => {
         loadImage(img, img.dataset.highres);
       });
+
+      const sections = document.querySelectorAll('.section h2');
+      sections.forEach(header => {
+        header.addEventListener('click', () => toggleSection(header.parentElement));
+      });
     });
   </script>
 </head>
@@ -121,15 +171,25 @@
     <img src="logo_low.png" data-highres="logo.png" alt="Логотип заведения" class="logo">
     <p>Следите за новостями здесь</p>
     <div class="social-icons">
-      <a href="https://vk.com/vinegret_donetsk"><img src="vk_logo_low.png" data-highres="vk_logo.png" alt="ВКонтакте"></a>
-      <a href="https://t.me/vinegret_dn"><img src="tg_logo_low.svg" data-highres="tg_logo.svg" alt="Телеграм"></a>
-      <a href="https://www.instagram.com/vinegret_don?igsh=N3ptemlsZzhwemVs"><img src="ig_logo_low.webp" data-highres="ig_logo.webp" alt="Инстаграм"></a>
+      <a href="https://vk.com/vinegret_donetsk"><img src="vk_logo.png" alt="ВКонтакте"></a>
+      <a href="https://t.me/vinegret_dn"><img src="tg_logo.svg" alt="Телеграм"></a>
+      <a href="https://www.instagram.com/vinegret_don?igsh=N3ptemlsZzhwemVs"><img src="ig_logo.webp" alt="Инстаграм"></a>
     </div>
     <p class="phone"><a href="tel:+79495061116">Телефон: +7 949 506 11 16</a></p>
-    <div>
+    
+    <div class="section">
+      <h2>Масленица</h2>
       <img src="menu1_low.jpg" data-highres="menu1.jpg" alt="Меню 1">
+    </div>
+
+    <div class="section">
+      <h2>Барная карта</h2>
       <img src="menu3_low.jpg" data-highres="menu3.jpg" alt="Меню 2">
       <img src="menu2_low.jpg" data-highres="menu2.jpg" alt="Меню 3">
+    </div>
+
+    <div class="section">
+      <h2>Меню</h2>
       <img src="menu4_low.jpg" data-highres="menu4.jpg" alt="Меню 4">
       <img src="menu5_low.jpg" data-highres="menu5.jpg" alt="Меню 5">
     </div>
