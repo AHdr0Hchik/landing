@@ -279,6 +279,30 @@
         bottom: 10px;
       }
     }
+
+    .zoomable {
+      transition: transform 0.3s ease;
+      cursor: zoom-in;
+    }
+
+    .zoomed {
+      cursor: grab;
+      position: relative;
+    }
+
+    .slider-container {
+      overflow: hidden;
+    }
+
+    .slider {
+      display: flex;
+      transition: transform 0.3s ease;
+    }
+
+    .slider img {
+      width: 100%;
+      flex-shrink: 0;
+    }
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
