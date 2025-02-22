@@ -330,6 +330,12 @@
       let startX = 0;
       let currentX = 0;
 
+      let isDragging = false;
+      let startPos = { x: 0, y: 0 };
+      let currentPos = { x: 0, y: 0 };
+      let isZoomed = false;
+      let zoomedImage = null;
+
       const container = document.createElement('div');
       container.className = 'preview-container';
 
@@ -375,8 +381,12 @@
         const slider = modal.querySelector('.slider');
         slider.style.transform = `translateX(-${currentImageIndex * 100}%)`;
         slider.innerHTML = currentSection.images
-          .map(img => `<img src="${img}" alt="Slide">`)
+          .map(img => `<img src="${img}" alt="Slide" class="zoomable">`)
           .join('');
+        
+        slider.querySelectorAll('.zoomable').forEach(img => {
+          img.addEventListener('click', (e) => toggleZoom(img, e));
+        });
       }
 
       function updatePagination() {
@@ -440,10 +450,6 @@
         }
       });
 
-      let isDragging = false;
-      let startPos = { x: 0, y: 0 };
-      let currentPos = { x: 0, y: 0 };
-
       function updateSlider() {
         const slider = modal.querySelector('.slider');
         slider.style.transform = `translateX(-${currentImageIndex * 100}%)`;
@@ -464,63 +470,108 @@
         if (img.classList.contains('zoomed')) {
           img.classList.remove('zoomed');
           img.style.transform = '';
+          img.style.left = '';
+          img.style.top = '';
+          isZoomed = false;
+          zoomedImage = null;
         } else {
           img.classList.add('zoomed');
           const rect = img.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
+          const x = (e.clientX || e.touches[0].clientX) - rect.left;
+          const y = (e.clientY || e.touches[0].clientY) - rect.top;
           img.style.transformOrigin = `${x}px ${y}px`;
           img.style.transform = 'scale(2)';
+          isZoomed = true;
+          zoomedImage = img;
         }
       }
 
       function startDrag(e) {
-        if (!e.target.classList.contains('zoomed')) return;
+        if (!isZoomed) return;
         isDragging = true;
         startPos = { 
           x: e.clientX || e.touches[0].clientX, 
           y: e.clientY || e.touches[0].clientY 
         };
         currentPos = { ...startPos };
-        e.target.style.cursor = 'grabbing';
-        
-        document.addEventListener('mousemove', drag);
-        document.addEventListener('mouseup', endDrag);
-        document.addEventListener('touchmove', drag, { passive: false });
-        document.addEventListener('touchend', endDrag);
-        
-        e.preventDefault(); // Предотвращаем срабатывание других обработчиков
+        zoomedImage.style.cursor = 'grabbing';
+        e.preventDefault();
       }
 
       function drag(e) {
-        if (!isDragging) return;
+        if (!isDragging || !isZoomed) return;
         e.preventDefault();
         const clientX = e.clientX || e.touches[0].clientX;
         const clientY = e.clientY || e.touches[0].clientY;
         const dx = clientX - currentPos.x;
         const dy = clientY - currentPos.y;
         currentPos = { x: clientX, y: clientY };
-        const img = modal.querySelector('.zoomed');
-        const rect = img.getBoundingClientRect();
+        const rect = zoomedImage.getBoundingClientRect();
         const scale = 2;
         const maxX = (rect.width * scale - rect.width) / 2;
         const maxY = (rect.height * scale - rect.height) / 2;
-        const currentX = parseFloat(img.style.left || '0');
-        const currentY = parseFloat(img.style.top || '0');
-        img.style.left = `${Math.max(-maxX, Math.min(maxX, currentX + dx))}px`;
-        img.style.top = `${Math.max(-maxY, Math.min(maxY, currentY + dy))}px`;
+        const currentX = parseFloat(zoomedImage.style.left || '0');
+        const currentY = parseFloat(zoomedImage.style.top || '0');
+        zoomedImage.style.left = `${Math.max(-maxX, Math.min(maxX, currentX + dx))}px`;
+        zoomedImage.style.top = `${Math.max(-maxY, Math.min(maxY, currentY + dy))}px`;
       }
 
-      function endDrag(e) {
+      function endDrag() {
         if (!isDragging) return;
         isDragging = false;
-        const img = modal.querySelector('.zoomed');
-        if (img) img.style.cursor = 'grab';
-        
-        document.removeEventListener('mousemove', drag);
-        document.removeEventListener('mouseup', endDrag);
-        document.removeEventListener('touchmove', drag);
-        document.removeEventListener('touchend', endDrag);
+        if (zoomedImage) zoomedImage.style.cursor = 'grab';
+      }
+
+      slider.addEventListener('mousedown', handleSliderStart);
+      slider.addEventListener('touchstart', handleSliderStart);
+
+      document.addEventListener('mousemove', handleSliderMove);
+      document.addEventListener('touchmove', handleSliderMove);
+
+      document.addEventListener('mouseup', handleSliderEnd);
+      document.addEventListener('touchend', handleSliderEnd);
+
+      function handleSliderStart(e) {
+        if (isZoomed) {
+          startDrag(e);
+        } else {
+          startX = e.clientX || e.touches[0].clientX;
+          currentX = startX;
+          slider.style.transition = 'none';
+        }
+      }
+
+      function handleSliderMove(e) {
+        if (isZoomed) {
+          drag(e);
+        } else if (typeof startX !== 'undefined') {
+          currentX = e.clientX || e.touches[0].clientX;
+          const diff = currentX - startX;
+          const shift = -(currentImageIndex * 100) + (diff / slider.offsetWidth * 100);
+          slider.style.transform = `translateX(${shift}%)`;
+        }
+      }
+
+      function handleSliderEnd(e) {
+        if (isZoomed) {
+          endDrag();
+        } else if (typeof startX !== 'undefined') {
+          slider.style.transition = 'transform 0.3s ease';
+          const diff = currentX - startX;
+          const threshold = slider.offsetWidth * 0.2;
+
+          if (Math.abs(diff) > threshold) {
+            if (diff > 0 && currentImageIndex > 0) {
+              currentImageIndex--;
+            } else if (diff < 0 && currentImageIndex < currentSection.images.length - 1) {
+              currentImageIndex++;
+            }
+          }
+
+          updateSlider();
+          updatePagination();
+          startX = undefined;
+        }
       }
     });
   </script>
