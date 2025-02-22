@@ -138,29 +138,279 @@
         font-size: 1.5em;
       }
     }
+  
+    .preview-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+      padding: 0 20px;
+    }
+
+    .preview-block {
+      height: 384px;
+      border-radius: 32px;
+      background-size: cover;
+      background-position: center;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .preview-block:hover {
+      transform: scale(1.02);
+    }
+
+    .preview-title {
+      width: 200px;
+      color: white;
+      font-size: 1.5rem;
+      line-height: 100px;
+      background-color: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(5px);
+      border-radius: 0 0 20px 20px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      touch-action: none;
+    }
+
+    .modal-content {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slider-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slider {
+      display: flex;
+      transition: transform 0.3s ease;
+      height: 100%;
+      width: 100%;
+    }
+
+    .slider img {
+      min-width: 100%;
+      height: 100%;
+      object-fit: contain;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: white;
+      font-size: 30px;
+      cursor: pointer;
+      z-index: 1001;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+    }
+
+    .pagination {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 1001;
+    }
+
+    .pagination-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      transition: all 0.3s ease;
+    }
+
+    .pagination-dot.active {
+      background: white;
+      transform: scale(1.2);
+    }
+
+    @media (max-width: 768px) {
+      .preview-container {
+        grid-template-columns: 1fr;
+        padding: 0 10px;
+      }
+
+      .preview-block {
+        height: 300px;
+      }
+
+      .modal-close {
+        top: 10px;
+        right: 10px;
+        font-size: 24px;
+      }
+
+      .pagination {
+        bottom: 10px;
+      }
+    }
   </style>
   <script>
-    function toggleSection(section) {
-      section.classList.toggle('active');
-    }
-
-    function loadImage(imgElement, highResSrc) {
-      const tempImg = new Image();
-      tempImg.src = highResSrc;
-      tempImg.onload = () => {
-        imgElement.src = highResSrc;
-      };
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
-      const images = document.querySelectorAll('img[data-highres]');
-      images.forEach(img => {
-        loadImage(img, img.dataset.highres);
+      const sections = [
+        {
+          title: 'Масленица',
+          background: 'bg.jpg',
+          images: ['menu1.jpg']
+        },
+        {
+          title: 'Барная карта',
+          background: 'bg.jpg',
+          images: ['menu3.jpg', 'menu2.jpg']
+        },
+        {
+          title: 'Меню',
+          background: 'bg.jpg',
+          images: ['menu4.jpg', 'menu5.jpg']
+        }
+      ];
+
+      let currentSection = null;
+      let currentImageIndex = 0;
+      let startX = 0;
+      let currentX = 0;
+
+      const container = document.createElement('div');
+      container.className = 'preview-container';
+
+      const modal = document.createElement('div');
+      modal.className = 'modal';
+      modal.innerHTML = `
+        <span class="modal-close">&times;</span>
+        <div class="modal-content">
+          <div class="slider-container">
+            <div class="slider"></div>
+          </div>
+        </div>
+        <div class="pagination"></div>
+      `;
+
+      document.body.appendChild(modal);
+
+      sections.forEach((section, index) => {
+        const preview = document.createElement('div');
+        preview.className = 'preview-block';
+        preview.style.backgroundImage = `url(${section.background})`;
+        preview.innerHTML = `
+          <div class="preview-title">
+            ${section.title}
+          </div>
+        `;
+        preview.addEventListener('click', () => openModal(index));
+        container.appendChild(preview);
       });
 
-      const sections = document.querySelectorAll('.section h2');
-      sections.forEach(header => {
-        header.addEventListener('click', () => toggleSection(header.parentElement));
+      const phone = document.querySelector('.phone');
+      phone.parentNode.insertBefore(container, phone.nextSibling);
+
+      function openModal(sectionIndex) {
+        currentSection = sections[sectionIndex];
+        currentImageIndex = 0;
+        updateSlider();
+        updatePagination();
+        modal.style.display = 'block';
+      }
+
+      function updateSlider() {
+        const slider = modal.querySelector('.slider');
+        slider.style.transform = `translateX(-${currentImageIndex * 100}%)`;
+        slider.innerHTML = currentSection.images
+          .map(img => `<img src="${img}" alt="Slide">`)
+          .join('');
+      }
+
+      function updatePagination() {
+        const pagination = modal.querySelector('.pagination');
+        pagination.innerHTML = currentSection.images
+          .map((_, index) => `
+            <div class="pagination-dot ${index === currentImageIndex ? 'active' : ''}"></div>
+          `)
+          .join('');
+      }
+
+      // Обработчики событий остаются теми же
+
+      modal.querySelector('.modal-close').addEventListener('click', () => {
+        modal.style.display = 'none';
+      });
+
+      const slider = modal.querySelector('.slider');
+
+      slider.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        currentX = startX;
+        slider.style.transition = 'none';
+      }, { passive: true });
+
+      slider.addEventListener('touchmove', (e) => {
+        currentX = e.touches[0].clientX;
+        const diff = currentX - startX;
+        const shift = -(currentImageIndex * 100) + (diff / slider.offsetWidth * 100);
+        slider.style.transform = `translateX(${shift}%)`;
+      }, { passive: true });
+
+      slider.addEventListener('touchend', () => {
+        slider.style.transition = 'transform 0.3s ease';
+        const diff = currentX - startX;
+        const threshold = slider.offsetWidth * 0.2;
+
+        if (Math.abs(diff) > threshold) {
+          if (diff > 0 && currentImageIndex > 0) {
+            currentImageIndex--;
+          } else if (diff < 0 && currentImageIndex < currentSection.images.length - 1) {
+            currentImageIndex++;
+          }
+        }
+
+        updateSlider();
+        updatePagination();
+      });
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (modal.style.display === 'block' && e.key === 'Escape') {
+          modal.style.display = 'none';
+        }
       });
     });
   </script>
@@ -177,29 +427,13 @@
     </div>
     <p class="phone"><a href="tel:+79495061116">Телефон: +7 949 506 11 16</a></p>
     
-    <div class="section">
-      <h2>Масленица</h2>
-      <img src="menu1_low.jpg" data-highres="menu1.jpg" alt="Меню 1">
-    </div>
-
-    <div class="section">
-      <h2>Барная карта</h2>
-      <img src="menu3_low.jpg" data-highres="menu3.jpg" alt="Меню 2">
-      <img src="menu2_low.jpg" data-highres="menu2.jpg" alt="Меню 3">
-    </div>
-
-    <div class="section">
-      <h2>Меню</h2>
-      <img src="menu4_low.jpg" data-highres="menu4.jpg" alt="Меню 4">
-      <img src="menu5_low.jpg" data-highres="menu5.jpg" alt="Меню 5">
-    </div>
-  </div>
-  <footer class="bg-light text-center p-3">
-    <p>ООО "ТАМЕЛЬ"</p>
-    <p>ИНН: 9307005340</p>
-    <p>ОГРН: 1229300088599</p>
-    <p>Юридический и фактический адрес: Донецкая Народная респ., Шахтерский м.о., г. Кировское, ул. Панфиловцев, д. 34Б</p>
-    <p>© 2025 Винегрет. Все права защищены.</p>
-  </footer>
+    <footer class="bg-light text-center p-3">
+      <p>ООО "ТАМЕЛЬ"</p>
+      <p>ИНН: 9307005340</p>
+      <p>ОГРН: 1229300088599</p>
+      <p>Юридический и фактический адрес: Донецкая Народная респ., Шахтерский м.о., г. Кировское, ул. Панфиловцев, д. 34Б</p>
+      <p>© 2025 Винегрет. Все права защищены.</p>
+    </footer>
+  </div>  
 </body>
 </html>
