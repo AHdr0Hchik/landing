@@ -413,10 +413,13 @@
     try {
       const proxyUrl = 'https://api.allorigins.win/get?url=';
       const targetUrl = encodeURIComponent('http://109.254.195.136:787/api/menu');
-      
+    
       const response = await fetch(proxyUrl + targetUrl);
       const data = await response.json();
-      const { menu: menuData, categories, subcategories } = JSON.parse(data.contents);
+      console.log(data.contents)
+      const menu = JSON.parse(JSON.parse(data.contents));
+      const {menu: menuData, categories, subcategories} = menu
+      console.log(menuData)
   
       // Создаем мапы для быстрого доступа к категориям и подкатегориям
       const categoryMap = new Map(categories.map(cat => [cat.id, cat.category_name]));
