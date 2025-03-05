@@ -209,11 +209,6 @@
     margin: 0 0 15px 0;
     font-size: 1.2em;
   }
-  .menu-item h4 {
-    color: #333;
-    margin: 0 0 15px 0;
-    font-size: 1em;
-  }
   
   .subcategory-badge {
     display: inline-block;
@@ -392,9 +387,6 @@
   .menu-item h3 {
     color: #ffffff;
   }
-  .menu-item h4 {
-    color: #ffffff;
-  }
 
   .price-tag {
     background: #444;
@@ -419,7 +411,6 @@
           'Origin': 'https://ahdr0hchik.github.io/landing/'
         }
       });
-      
       const data = await response.json();
       const { menu: menuData, categories, subcategories } = JSON.parse(data);
   
@@ -469,9 +460,6 @@
   
           const title = document.createElement('h3');
           title.textContent = item.name;
-          
-          const descripton = document.createElement('h4');
-          descripton.textContent = item.descripton;
   
           const priceList = document.createElement('div');
           priceList.className = 'price-list';
@@ -492,7 +480,6 @@
   
           menuItem.appendChild(subcategoryBadge);
           menuItem.appendChild(title);
-          menuItem.appendChild(descripton);
           menuItem.appendChild(priceList);
           itemsGrid.appendChild(menuItem);
         });
