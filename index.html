@@ -139,6 +139,396 @@
       }
     }
   </style>
+
+
+<style>
+  .menu-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .menu-category {
+    margin-bottom: 40px;
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+  
+  .category-title {
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #eee;
+    text-align: center;
+  }
+  
+  .menu-items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  
+  .menu-item {
+    background: #f8f8f8;
+    border-radius: 12px;
+    padding: 15px;
+    transition: all 0.3s ease;
+    transform: translateY(0);
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .menu-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  }
+  
+  .menu-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: 0.5s;
+  }
+  
+  .menu-item:hover::before {
+    left: 100%;
+  }
+  
+  .menu-item h3 {
+    color: #333;
+    margin: 0 0 15px 0;
+    font-size: 1.2em;
+  }
+  
+  .subcategory-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 0.8em;
+    margin-bottom: 8px;
+    background: #e0e0e0;
+    color: #666;
+  }
+  
+  .price-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  
+  .price-tag {
+    background: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.9em;
+    color: #333;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+  }
+  
+  .price-tag:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .menu-container {
+      padding: 10px;
+    }
+  
+    .menu-category {
+      margin-bottom: 20px;
+      padding: 15px;
+    }
+  
+    .category-title {
+      font-size: 1.4em;
+    }
+  
+    .menu-items-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .menu-item {
+      padding: 12px;
+    }
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .menu-item {
+      animation: none;
+      transition: none;
+    }
+    
+    .menu-item::before {
+      display: none;
+    }
+  }
+
+  /* Добавьте эти стили к существующим */
+.category-title {
+  position: relative;
+  cursor: pointer;
+  padding-right: 30px;
+  transition: all 0.3s ease;
+}
+
+.category-title::after {
+  content: '▼';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.3s ease;
+}
+
+.category-title.collapsed::after {
+  transform: translateY(-50%) rotate(-180deg);
+}
+
+.menu-items-grid {
+  transition: max-height 0.3s ease-out;
+  overflow: hidden;
+}
+
+/* Улучшенные стили для цен */
+.price-tag {
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  border: 1px solid rgba(0,0,0,0.1);
+  backdrop-filter: blur(5px);
+}
+
+/* Добавим анимацию при наведении на категории */
+.menu-category {
+  transition: transform 0.3s ease;
+}
+
+.menu-category:hover {
+  transform: translateY(-5px);
+}
+
+/* Стили для состояния загрузки */
+.loading {
+  text-align: center;
+  padding: 20px;
+  font-size: 1.2em;
+  color: #666;
+}
+
+.loading::after {
+  content: '...';
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { content: '.'; }
+  33% { content: '..'; }
+  66% { content: '...'; }
+}
+
+/* Улучшенные стили для мобильных устройств */
+@media (max-width: 768px) {
+  .category-title {
+    font-size: 1.2em;
+    padding: 10px 0;
+  }
+
+  .menu-item {
+    margin-bottom: 15px;
+  }
+
+  .price-tag {
+    font-size: 0.85em;
+  }
+
+  .subcategory-badge {
+    font-size: 0.75em;
+  }
+}
+
+/* Добавим темную тему */
+@media (prefers-color-scheme: dark) {
+  .menu-category {
+    background: #2a2a2a;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+
+  .category-title {
+    color: #ffffff;
+    border-bottom-color: #444;
+  }
+
+  .menu-item {
+    background: #333;
+  }
+
+  .menu-item h3 {
+    color: #ffffff;
+  }
+
+  .price-tag {
+    background: #444;
+    color: #ffffff;
+  }
+
+  .subcategory-badge {
+    background: #555;
+    color: #ffffff;
+  }
+}
+  </style>
+  
+  <script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const response = await fetch('http://109.254.195.136:787/api/menu');
+      const data = await response.json();
+      const { menu: menuData, categories, subcategories } = JSON.parse(data);
+  
+      // Создаем мапы для быстрого доступа к категориям и подкатегориям
+      const categoryMap = new Map(categories.map(cat => [cat.id, cat.category_name]));
+      const subcategoryMap = new Map(subcategories.map(sub => [sub.id, sub.subcategory_name]));
+  
+      // Группируем блюда по категориям
+      const groupedMenu = menuData.reduce((acc, item) => {
+        const categoryName = categoryMap.get(item.category) || 'Другое';
+        if (!acc[categoryName]) {
+          acc[categoryName] = [];
+        }
+        acc[categoryName].push(item);
+        return acc;
+      }, {});
+  
+      const menuContainer = document.createElement('div');
+      menuContainer.className = 'menu-container';
+  
+      // Создаем секции для каждой категории
+      Object.entries(groupedMenu).forEach(([categoryName, items]) => {
+        // Пропускаем технические категории
+        if (categoryName === 'Техническое' || categoryName === 'Упаковки') {
+          return;
+        }
+  
+        const categorySection = document.createElement('div');
+        categorySection.className = 'menu-category';
+        
+        const categoryTitle = document.createElement('h2');
+        categoryTitle.className = 'category-title';
+        categoryTitle.textContent = categoryName;
+        categorySection.appendChild(categoryTitle);
+  
+        const itemsGrid = document.createElement('div');
+        itemsGrid.className = 'menu-items-grid';
+        
+        items.forEach((item, index) => {
+          const menuItem = document.createElement('div');
+          menuItem.className = 'menu-item';
+          menuItem.style.animationDelay = `${index * 0.1}s`;
+  
+          const subcategoryBadge = document.createElement('div');
+          subcategoryBadge.className = 'subcategory-badge';
+          subcategoryBadge.textContent = subcategoryMap.get(item.subcategory) || 'Общее';
+  
+          const title = document.createElement('h3');
+          title.textContent = item.name;
+  
+          const priceList = document.createElement('div');
+          priceList.className = 'price-list';
+  
+          if (item.Pricelists && item.Pricelists.length > 0) {
+            item.Pricelists.forEach(price => {
+              const priceTag = document.createElement('div');
+              priceTag.className = 'price-tag';
+              priceTag.textContent = `${price.size}${price.size === 1 ? ' порц.' : ' см'} - ${price.price}₽`;
+              priceList.appendChild(priceTag);
+            });
+          } else {
+            const noPriceTag = document.createElement('div');
+            noPriceTag.className = 'price-tag';
+            noPriceTag.textContent = 'Временно недоступно';
+            priceList.appendChild(noPriceTag);
+          }
+  
+          menuItem.appendChild(subcategoryBadge);
+          menuItem.appendChild(title);
+          menuItem.appendChild(priceList);
+          itemsGrid.appendChild(menuItem);
+        });
+  
+        categorySection.appendChild(itemsGrid);
+        menuContainer.appendChild(categorySection);
+      });
+  
+      // Создаём новый раздел для меню
+      const menuSection = document.createElement('div');
+      menuSection.className = 'section';
+      menuSection.appendChild(menuContainer);
+  
+      // Находим контейнер и добавляем меню
+    const container = document.querySelector('.container');
+    if (container) {
+      const footer = document.querySelector('footer')
+      footer.insertAdjacentElement('beforebegin', menuSection);
+    } else {
+      document.body.appendChild(menuSection);
+    }
+
+    // Добавляем обработчик для сворачивания/разворачивания категорий
+    const categoryTitles = document.querySelectorAll('.category-title');
+    categoryTitles.forEach(title => {
+      title.addEventListener('click', () => {
+        const itemsGrid = title.nextElementSibling;
+        const isExpanded = itemsGrid.style.display !== 'none';
+        
+        // Добавляем плавную анимацию
+        if (isExpanded) {
+          itemsGrid.style.maxHeight = itemsGrid.scrollHeight + 'px';
+          setTimeout(() => {
+            itemsGrid.style.maxHeight = '0';
+            setTimeout(() => {
+              itemsGrid.style.display = 'none';
+            }, 300);
+          }, 0);
+        } else {
+          itemsGrid.style.display = 'grid';
+          itemsGrid.style.maxHeight = '0';
+          setTimeout(() => {
+            itemsGrid.style.maxHeight = itemsGrid.scrollHeight + 'px';
+          }, 0);
+        }
+
+        // Добавляем визуальную индикацию
+        title.classList.toggle('collapsed');
+      });
+    });
+
+  } catch (error) {
+    console.error('Ошибка загрузки меню:', error);
+    alert('Не удалось загрузить меню. Пожалуйста, попробуйте позже.');
+  }
+});
+</script>
   <script>
     function toggleSection(section) {
       section.classList.toggle('active');
@@ -152,7 +542,7 @@
       };
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       const images = document.querySelectorAll('img[data-highres]');
       images.forEach(img => {
         loadImage(img, img.dataset.highres);
@@ -177,7 +567,7 @@
     </div>
     <p class="phone"><a href="tel:+79495061116">Телефон: +7 949 506 11 16</a></p>
     
-    <div class="section">
+    <!-- <div class="section">
       <h2>Масленица</h2>
       <img src="menu1_low.jpg" data-highres="menu1.jpg" alt="Меню 1">
     </div>
@@ -198,7 +588,7 @@
       <img src="menu4_low.jpg" data-highres="menu4.jpg" alt="Меню 4">
       <img src="menu5_low.jpg" data-highres="menu5.jpg" alt="Меню 5">
     </div>
-  </div>
+  </div> -->
   <footer class="bg-light text-center p-3">
     <p>ООО "ТАМЕЛЬ"</p>
     <p>ИНН: 9307005340</p>
