@@ -209,6 +209,11 @@
     margin: 0 0 15px 0;
     font-size: 1.2em;
   }
+  .menu-item h4 {
+    color: #333;
+    margin: 0 0 15px 0;
+    font-size: 1em;
+  }
   
   .subcategory-badge {
     display: inline-block;
@@ -387,6 +392,9 @@
   .menu-item h3 {
     color: #ffffff;
   }
+  .menu-item h4 {
+    color: #ffffff;
+  }
 
   .price-tag {
     background: #444;
@@ -403,16 +411,15 @@
   <script>
   document.addEventListener('DOMContentLoaded', async () => {
     try {
-      const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-      const targetUrl = 'http://109.254.195.136:787/api/menu';
-      
-      const response = await fetch(proxyUrl + targetUrl, {
-        headers: {
-          'Origin': 'https://ahdr0hchik.github.io/landing/'
-        }
-      });
+      const proxyUrl = 'https://api.allorigins.win/get?url=';
+      const targetUrl = encodeURIComponent('http://109.254.195.136:787/api/menu');
+    
+      const response = await fetch(proxyUrl + targetUrl);
       const data = await response.json();
-      const { menu: menuData, categories, subcategories } = JSON.parse(data);
+      console.log(data.contents)
+      const menu = JSON.parse(JSON.parse(data.contents));
+      const {menu: menuData, categories, subcategories} = menu
+      console.log(menuData)
   
       // Создаем мапы для быстрого доступа к категориям и подкатегориям
       const categoryMap = new Map(categories.map(cat => [cat.id, cat.category_name]));
@@ -460,6 +467,9 @@
   
           const title = document.createElement('h3');
           title.textContent = item.name;
+          
+          const descripton = document.createElement('h4');
+          descripton.textContent = item.descripton;
   
           const priceList = document.createElement('div');
           priceList.className = 'price-list';
@@ -480,6 +490,7 @@
   
           menuItem.appendChild(subcategoryBadge);
           menuItem.appendChild(title);
+          menuItem.appendChild(descripton);
           menuItem.appendChild(priceList);
           itemsGrid.appendChild(menuItem);
         });
