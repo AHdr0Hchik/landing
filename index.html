@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
   <title>Меню Кафе</title>
   <style>
     body {
@@ -402,7 +403,9 @@
   <script>
   document.addEventListener('DOMContentLoaded', async () => {
     try {
-      const response = await fetch('http://109.254.195.136:787/api/menu');
+      const response = await fetch('http://109.254.195.136:787/api/menu', {
+        headers: {"Content-Security-Policy" : "upgrade-insecure-requests;"}
+      });
       const data = await response.json();
       const { menu: menuData, categories, subcategories } = JSON.parse(data);
   
