@@ -416,7 +416,7 @@
       
       const response = await fetch(proxyUrl + targetUrl);
       const data = await response.json();
-      const { menu: menuData, categories, subcategories } = JSON.parse(data);
+      const { menu: menuData, categories, subcategories } = JSON.parse(data.contents);
   
       // Создаем мапы для быстрого доступа к категориям и подкатегориям
       const categoryMap = new Map(categories.map(cat => [cat.id, cat.category_name]));
