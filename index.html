@@ -403,8 +403,13 @@
   <script>
   document.addEventListener('DOMContentLoaded', async () => {
     try {
-      const response = await fetch('http://109.254.195.136:787/api/menu', {
-        headers: {"Content-Security-Policy" : "upgrade-insecure-requests;"}
+      const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+      const targetUrl = 'http://109.254.195.136:787/api/menu';
+      
+      const response = await fetch(proxyUrl + targetUrl, {
+        headers: {
+          'Origin': 'https://ahdr0hchik.github.io/landing/'
+        }
       });
       const data = await response.json();
       const { menu: menuData, categories, subcategories } = JSON.parse(data);
